@@ -42,21 +42,21 @@ function [x] = defcg(k,A,b,x0,W,eps,AW,M,mi)
     assert(size(W,2)==k, 'W needs to be n by k');
     
     % Checking if Mi is provided
-    if ~exists('mi', 'var') || isempty(mi)
+    if ~exist('mi', 'var') || isempty(mi)
       mi = 500;
     end
 
     % Checking if AW is provided
-    if ~exists('AW', 'var') || isempty(AW)
+    if ~exist('AW', 'var') || isempty(AW)
       AW = A*W;
     end
 
     % Non-Preconditioned Deflated-CG
-    if ~exists('M','var') || isempty(M)
-      x = nonpcdcg(k,A,b,x0,W,eps,AW,mi);
+    if ~exist('M','var') || isempty(M)
+      x = nonpcdcg(A,b,x0,W,eps,AW,mi);
     else
       % Preconditioned Deflated-CG
-      x = pcdcg(k,A,b,x0,W,eps,AW,M,mi);
+      x = pcdcg(A,b,x0,W,eps,AW,M,mi);
     end
 end
 
