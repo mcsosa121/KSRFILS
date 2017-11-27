@@ -37,11 +37,12 @@ function x = nonpcg(A,b,x0,mi,eps)
     dt0 = dtnew;
     
     while (i < mi) && (dtnew > eps^2*dt0)
-        disp('hi')
         q = A*d;
         alpha = dtnew / (transpose(d)*q);
         x = x + alpha*d;
 
+        % periodically calculate residual explicitely to avoid numerical
+        % error from recurrence
         if mod(i,50) == 0
             r = b - A*x;
         else
@@ -72,6 +73,8 @@ function x = pcg(A,b,x0,mi,eps,M)
         alpha = dtnew / (transpose(d)*q);
         x = x + alpha*d;
 
+        % periodically calculate residual explicitely to avoid numerical
+        % error from recurrence
         if mod(i,50) == 0
             r = b - A*x;
         else
