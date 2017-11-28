@@ -13,7 +13,6 @@
       k - Desired number of eigenvectors
 %}
 function [W, e] = old_aeig(A, k)
-    j = 2*k;
     % need to implement
     n = size(A,1);
     v = randn(n,1);
@@ -26,7 +25,7 @@ function [W, e] = old_aeig(A, k)
     w = wp - a*v;
     T(1,1) = a;
     
-    for j = 2:j
+    for j = 2:k
         b = norm(w);
         vprev = v;
         if b ~= 0

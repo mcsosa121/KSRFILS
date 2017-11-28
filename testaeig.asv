@@ -1,0 +1,23 @@
+A = rand(1000,1000);
+A = A+A';
+opts.issym = 1;
+tic
+    [V,et] = eigs(A,10,'lm',opts);
+toc
+tic
+[W,e] = aeig(A,10);
+toc
+tic
+[X,eo] = old_aeig(A,10);
+toc
+tic
+[Y,Z,Q,eoo] = space_aeig(A,10);
+toc
+norm(sort(diag(et)) - sort(diag(e)))
+norm(sort(diag(et)) - sort(diag(eo)))
+norm(sort(diag(et)) - sort(diag(eoo)))
+
+eigt = 0;
+eigspace = 0;
+for i = 1:10:
+    eigt += norm(V(
