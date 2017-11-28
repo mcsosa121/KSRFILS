@@ -10,24 +10,23 @@
 
     Lanczos adapted from Prof Bindel's code from CS6210:
     https://github.com/dbindel/cs6210-f16/blob/49fce07c0427633bee13ef62fe9f1719ea22194e/lec/code/iter/lanczos.m
-    Space saving equivalent of space_aeig.m, discarding old Q, since it is
-    not needed.
+    
+    V obeys r = (A ? ?I)v ? K_k(A,b), for all v in V.
 
     Input:
       A - Problem matrix
       k - Desired number of eigenvectors
+      b - Starting vector (should be random, e.g. randn(n,1))
 
     Output:
       V - Approximate eigenvectors
       e - Approximate eigenvalues
 %}
-%function [V, b, e] = aeig(A, k)
-function [V, b, e] = aeig(A, k)
+function [V, e] = aeig(A, k, b)
   n = length(A);
   Q = zeros(n,k+1);   % Orthonormal basis
   alpha = zeros(k+1,1);
-  beta  = zeros(k,1);
-  b = randn(n,1);
+  beta  = zeros(k,1);  
   
   Q(:,1) = b/norm(b);
   for j = 1:k
