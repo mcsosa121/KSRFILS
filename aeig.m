@@ -24,24 +24,24 @@
 function [V, e] = aeig(A, k)
   n = length(A);
   Q = zeros(n,k+1);   % Orthonormal basis
-  alpha = zeros(k,1);
+  alpha = zeros(k+1,1);
   beta  = zeros(k,1);
   b = randn(n,1);
   
-  Qold = b/norm(b);
+  Q(:,1) = b/norm(b);
   for j = 1:k
-    Qnew = A*Qold;
-    alpha(j) = Qold'*Qnew;
-    Qnew = Qnew-alpha(j)*Qold;
+    Q(:,j+1) = A*Q(:,j);
+    alpha(j) = Q(:,j)'*Q(:,j+1);
+    Q(:,j+1) = Q(:,j+1)-alpha(j)*Q(:,j);
     if j > 1
-      Qnew = Qnew-beta(j-1)*Qold2;
+      Q(:,j+1) = Q(:,j+1)-beta(j-1)*Q(:,j-1);
     end
-    beta(j) = norm(Qnew);
-    Qnew = Qnew/beta(j);
-    Qold2 = Qold;
-    Qold = Qnew;
+    beta(j) = norm(Q(:,j+1));
+    Q(:,j+1) = Q(:,j+1)/beta(j);
   end
   
-  T = diag(alpha) + diag(beta(1:k-1),1) + diag(beta(1:k-1),-1);
-  [V,e] = eigs(T,k);
+  T = diag(alpha) + diag(beta,1) + diag(beta,-1);
+  [W,e] = eigs(T,k);  
+  
+  V = Q*W;
 end
