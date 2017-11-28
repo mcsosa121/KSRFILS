@@ -8,6 +8,9 @@
     a series of Ritz values which approximate the eigenvalues of A.
     Using these ritz values, corresponding eigenvectors can be found.
 
+    Lanczos adapted from Prof Bindel's code from CS6210:
+    https://github.com/dbindel/cs6210-f16/blob/49fce07c0427633bee13ef62fe9f1719ea22194e/lec/code/iter/lanczos.m
+    
     Input:
       A - Problem matrix
       k - Desired number of eigenvectors
