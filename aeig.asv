@@ -17,16 +17,15 @@
       e - Approximate eigenvalues
 %}
 function [V, e] = aeig(A, k)
-    j = 2*k;
     n = size(A,1);
     v = randn(n,1);
     v = v/norm(v);
-    Q = zeros(n,j+1);
-    alpha = zeros(j,1);
-    beta = zeros(j,1);
+    Q = zeros(n,k+1);
+    alpha = zeros(k,1);
+    beta = zeros(k,1);
     
     Q(:,1) = v/norm(v);
-    for j = 1:j
+    for j = 1:k
         Q(:,j+1) = A*Q(:,j);
         alpha(j) = Q(:,j)'*Q(:,j+1);
         Q(:,j+1) = Q(:,j+1)-alpha(j)*Q(:,j);
@@ -36,6 +35,6 @@ function [V, e] = aeig(A, k)
         beta(j) = norm(Q(:,j+1));
         Q(:,j+1) = Q(:,j+1)/beta(j);
     end
-    T = diag(alpha) + diag(beta(1:j-1),1) + diag(beta(1:j-1),-1);
-    [V,e] = eigs(T, k);
+    T = diag(alpha) + diag(beta(1:k-1),1) + diag(beta,-1);
+    [V,e] = eigs(T);
 end
