@@ -21,7 +21,8 @@
       V - Approximate eigenvectors
       e - Approximate eigenvalues
 %}
-function [V, e] = aeig(A, k)
+%function [V, b, e] = aeig(A, k)
+function [V, b, e] = aeig(A, k)
   n = length(A);
   Q = zeros(n,k+1);   % Orthonormal basis
   alpha = zeros(k+1,1);
@@ -38,6 +39,12 @@ function [V, e] = aeig(A, k)
     end
     beta(j) = norm(Q(:,j+1));
     Q(:,j+1) = Q(:,j+1)/beta(j);
+    
+    sum = 0;
+    for i = 1:j-1
+        sum = sum+(Q(:,j+1)'*Q(:,i))*Q(:,i);
+    end
+    Q(:,j+1) = Q(:,j+1) - sum;
   end
   
   T = diag(alpha) + diag(beta,1) + diag(beta,-1);
