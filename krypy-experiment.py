@@ -98,16 +98,8 @@ def experiment(A, b=None, k=10, numSystems=5, rank=1, maxiter=1000):
 def run_deflation(A, iterations, numSystems, filename, badq):
     """ Runs deflation solver on system Ax=b """
     try:
-        [cg_sol, deflated_sol, recycled_sol, cg_time, deflated_time, recycled_time] = \
-            experiment(A, numSystems=numSystems, k=3, maxiter=iterations)
-        itemlist = [filename,
-                    cg_sol[numSystems-1],
-                    deflated_sol[numSystems-1],
-                    recycled_sol[numSystems-1],
-                    cg_time,
-                    deflated_time,
-                    recycled_time]
-
+        [cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time] = experiment(A,numSystems=numSystems,k=3,maxiter=iterations)
+        itemlist = [filename,cg_sol[numSystems-1].resnorms,deflated_sol[numSystems-1].resnorms,recycled_sol[numSystems-1].resnorms,cg_time,deflated_time,recycled_time]
         with open('./results/res_'+filename[:-4]+'.txt', 'wb') as fp:
             pickle.dump(itemlist, fp)
     except (ConvergenceError, ArgumentError):
