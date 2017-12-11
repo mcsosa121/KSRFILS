@@ -89,6 +89,7 @@ sizes = []
 cg_t = []
 deflated_t = []
 recycled_t = []
+numSystems=5
 for file in os.listdir(directory):
     filename = os.fsdecode(file)
     print(filename)
@@ -100,9 +101,10 @@ for file in os.listdir(directory):
             break
     if A==None:
         print('Could not find matrix of',filename)
-    [cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time] = experiment(A,k=3,maxiter=10000)        
-    itemlist = [filename,cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time]
-    with open('./results/res'+filename[:-4]+'.txt', 'wb') as fp:
+    [cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time] = experiment(A,numSystems=numSystems,k=3,maxiter=10000)
+    itemlist = [filename,cg_sol[numSystems-1],deflated_sol[numSystems-1],recycled_sol[numSystems-1],cg_time,deflated_time,recycled_time]
+    #itemlist = [filename,cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time]
+    with open('./results/res_'+filename[:-4]+'.txt', 'wb') as fp:
         pickle.dump(itemlist, fp)
 
 '''
