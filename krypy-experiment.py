@@ -1,5 +1,6 @@
 import os
 import time
+import signal
 import numpy
 from krypy.linsys import LinearSystem, Cg
 from krypy.deflation import DeflatedCg, DeflatedGmres, Ritz
@@ -10,6 +11,15 @@ from krypy.recycling.evaluators import RitzApriori,RitzApproxKrylov
 from scipy import random, linalg,io,sparse
 import matplotlib.pyplot as plt
 import pickle
+
+# Time stuff
+class TimeoutException(Exception):
+    pass
+
+def timeout_handler(signum, frame):
+    raise TimeoutException
+
+signal.signal(signal.SIGALRM, timeout_handler)
 
 def find_deflation_subspace(A,b,k,ortho='dmgs',ritz_type='ritz'):
     Ar = Arnoldi(A,b,ortho=ortho)
@@ -33,7 +43,7 @@ def experiment(A,b=None,k=10,numSystems=5,rank=1,maxiter=1000):
     for i in range(1,numSystems):
         u = random.rand(matrixSize, rank)
         Asys.append(Asys[i-1] + numpy.dot(u,u.T))
-    
+
     systems = []
     for i in range(0,len(Asys)):
         systems.append(LinearSystem(A=Asys[i],b=b,self_adjoint=True,positive_definite=True))
@@ -83,14 +93,18 @@ pyplot.legend()
 pyplot.show()
 '''
 
-dir_name = './matrices/'
+dir_name = './done2/'
 directory = os.fsencode(dir_name)
 sizes = []
 cg_t = []
 deflated_t = []
 recycled_t = []
 numSystems=5
-for file in os.listdir(directory):
+
+dirl = os.listdir(directory)
+dirl.sort()
+
+for file in dirl:
     filename = os.fsdecode(file)
     print(filename)
     Mat = io.loadmat(dir_name+filename)
@@ -99,13 +113,23 @@ for file in os.listdir(directory):
         if type(Mat['Problem'][0][0][i]) == sparse.csc.csc_matrix:
             A = Mat['Problem'][0][0][i]
             break
+
     if A==None:
         print('Could not find matrix of',filename)
-    [cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time] = experiment(A,numSystems=numSystems,k=3,maxiter=10000)
-    itemlist = [filename,cg_sol[numSystems-1],deflated_sol[numSystems-1],recycled_sol[numSystems-1],cg_time,deflated_time,recycled_time]
-    #itemlist = [filename,cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time]
-    with open('./results/res_'+filename[:-4]+'.txt', 'wb') as fp:
-        pickle.dump(itemlist, fp)
+        continue
+    else:
+        # start the timer
+        signal.alarm(30)
+        try:
+            [cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time] = experiment(A,numSystems=numSystems,k=3,maxiter=20000)
+            itemlist = [filename,cg_sol[numSystems-1],deflated_sol[numSystems-1],recycled_sol[numSystems-1],cg_time,deflated_time,recycled_time]
+            #itemlist = [filename,cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time]
+            with open('./results/res_'+filename[:-4]+'.txt', 'wb') as fp:
+                pickle.dump(itemlist, fp)
+        except TimeoutException:
+            continue
+        else:
+            signal.alarm(0)
 
 '''
 sizes = numpy.array(sizes)
