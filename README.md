@@ -6,3 +6,6 @@ This is a course project for CS 6220: Data Sparse Matrix Computations. We plan t
 
 # Contributors
 Louise Lee and Mike Sosa
+
+Need to do:
+Run krypy-experiments.py, but change dir_name from './matrices/' to ./up_iter/' (matrices that do not converge within 1000 iterations)
