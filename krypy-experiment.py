@@ -83,7 +83,7 @@ pyplot.legend()
 pyplot.show()
 '''
 
-dir_name = './matrices/'
+dir_name = './up_iter/'
 directory = os.fsencode(dir_name)
 sizes = []
 cg_t = []
@@ -101,12 +101,16 @@ for file in os.listdir(directory):
             break
     if A==None:
         print('Could not find matrix of',filename)
-    [cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time] = experiment(A,numSystems=numSystems,k=3,maxiter=10000)
-    itemlist = [filename,cg_sol[numSystems-1],deflated_sol[numSystems-1],recycled_sol[numSystems-1],cg_time,deflated_time,recycled_time]
-    #itemlist = [filename,cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time]
-    with open('./results/res_'+filename[:-4]+'.txt', 'wb') as fp:
-        pickle.dump(itemlist, fp)
-
+        continue
+    else:
+        try:
+            [cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time] = experiment(A,numSystems=numSystems,k=3,maxiter=10000)
+            itemlist = [filename,cg_sol[numSystems-1],deflated_sol[numSystems-1],recycled_sol[numSystems-1],cg_time,deflated_time,recycled_time]
+            #itemlist = [filename,cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time]
+            with open('./results/res_'+filename[:-4]+'.txt', 'wb') as fp:
+                pickle.dump(itemlist, fp)
+        except krypy.utils.ConvergenceError:
+            continue
 '''
 sizes = numpy.array(sizes)
 cg_t = numpy.array(cg_t)
