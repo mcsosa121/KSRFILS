@@ -71,7 +71,7 @@ A = numpy.dot(R,R.transpose())
 
 [u,s,v] = numpy.linalg.svd(A)
 print(numpy.linalg.cond(u*numpy.diag(s)*v))
-for i in range(0,20):
+for i in range(0,10):
     print(i)
     s[0]=s[0]*5
     A = u*numpy.diag(s)*v
