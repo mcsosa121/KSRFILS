@@ -50,7 +50,6 @@ def experiment(A,b=None,k=10,numSystems=5,rank=1,maxiter=1000):
     ts = time.time()
     for i in range(0,len(Asys)):
         U=sparse.linalg.eigsh(Asys[i],k=k)
-        #U=find_deflation_subspace(Asys[i],b,k)
         deflated_sol = [DeflatedCg(systems[i],U=U[1],maxiter=maxiter)]
     te = time.time()
     deflated_time = (te-ts)*1000
@@ -66,15 +65,20 @@ def experiment(A,b=None,k=10,numSystems=5,rank=1,maxiter=1000):
 
     return [cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time]
 
-Mat = io.loadmat('./bcsstm39.mat')
-A = None
-for i in range(0,len(Mat['Problem'][0][0])):
-    if type(Mat['Problem'][0][0][i]) == sparse.csc.csc_matrix:
-        A = Mat['Problem'][0][0][i]
-        break
+cond = 10000000
+while(cond>1e5):
+    D = (random.rand(1,10000))[0]
+    cond = max(D)/min(D)
 
-if A==None:
-    print('Could not find matrix of',filename)
-else:
-    experiment(A,k=3,numSystems=10,rank=1,maxiter=1000)
-print('done')
+print(cond)
+sizes = [10,25,50,75,100,250,500,750,1000,2500,5000,7500,10000]
+D.sort()
+for size in sizes:
+    print(size)
+    l = numpy.linspace(0,9999,num=size,dtype=int)
+    A = numpy.diag(D[l])
+    numSystems=10
+    [cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time] = experiment(A,k=3,numSystems=numSystems,rank=1,maxiter=1000)
+    itemlist = [cg_sol[0].resnorms,deflated_sol[0].resnorms,recycled_sol[0].resnorms,cg_time,deflated_time,recycled_time,A.shape[0],cond]
+    with open('./size/'+str(size)+'.txt', 'wb') as fp:
+        pickle.dump(itemlist, fp)

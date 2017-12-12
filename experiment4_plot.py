@@ -6,12 +6,9 @@ from scipy import linalg,io,sparse
 from scipy.interpolate import UnivariateSpline
 
 def plot_with_trend(x,y,marker,label,color,deg):
-    plt.plot(x,y,marker=marker,label=label,color=color)    
-    #plt.plot(x,y,marker=marker,label=label,color=color,linestyle='None')
-    #z = numpy.polyfit(x, y, deg=deg)
-    #p = numpy.poly1d(z)
-    #plt.plot(x,p(x),"--")
-
+    #trendline is not helpful, removed.
+    plt.plot(x,y,marker=marker,label=label,color=color) 
+   
 size_list = []
 cond_list = []
 cg_tlist = []

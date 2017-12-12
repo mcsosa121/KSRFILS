@@ -74,27 +74,6 @@ def experiment(A, b=None, k=10, numSystems=5, rank=1, maxiter=1000):
 
     return [cg_sol, deflated_sol, recycled_sol, cg_time, deflated_time, recycled_time]
 
-
-"""
- matrixSize = 100
- numSystems = 30
- R = rand(matrixSize,matrixSize)
- A = dot(R,R.transpose())
- [cg_sol,deflated_sol,recycled_sol,cg_time,deflated_time,recycled_time] = experiment(A,numSystems=numSystems)
- print('CG time:',cg_time,'Deflated CG time:',deflated_time,'Recycled CG time:',recycled_time)
- # plot residuals
- from matplotlib import pyplot
- pyplot.figure(figsize=(6, 4), dpi=100)
- pyplot.xlabel('Iteration $i$')
- pyplot.ylabel(r'Relative residual norm $\frac{\|r_i\|}{\|b\|}$')
- pyplot.semilogy(cg_sol[numSystems-1].resnorms,label='cg')
- pyplot.semilogy(deflated_sol[numSystems-1].resnorms,label='deflated')
- pyplot.semilogy(recycled_sol[numSystems-1].resnorms,label='recycled')
- pyplot.legend()
- pyplot.show()
-"""
-
-
 def run_deflation(A, iterations, numSystems, filename, badq):
     """ Runs deflation solver on system Ax=b """
     try:
@@ -158,21 +137,6 @@ def run_tests(dir_name, iterations, timeout):
     print(timeoutfiles)
     print("Bad Files")
     print(badfiles)
-
-'''
-sizes = array(sizes)
-cg_t = array(cg_t)
-deflated_t = array(deflated_t)
-recycled_t = array(recycled_t)
-inds = sizes.argsort()
-plt.plot(sizes[inds],cg_t[inds],label='cg')
-plt.plot(sizes[inds],deflated_t[inds],label='deflated')
-plt.plot(sizes[inds],recycled_t[inds],label='recycled')
-plt.ylabel('time')
-plt.xlabel('size of matrix')
-plt.legend()
-plt.show()
-'''
 
 if __name__ == '__main__':
     run_tests('./up_iter/',15000,60)
