@@ -53,38 +53,53 @@ function [x] = defcg(k,A,b,x0,W,eps,AW,M,mi)
 
     % Non-Preconditioned Deflated-CG
     if ~exist('M','var') || isempty(M)
-      x = nonpcdcg(A,b,x0,W,eps,AW,mi);
+        % initial iteration
+        [x,mui] = nonpcdcg(A,b,x0,W,eps,AW,mi);
+        disp(x);
     else
       % Preconditioned Deflated-CG
-      x = pcdcg(A,b,x0,W,eps,AW,M,mi);
+      [x,mui] = pcdcg(A,b,x0,W,eps,AW,M,mi);
     end
 end
 
 
 % Non-Preconditioned Deflated-CG
-function [x] = nonpcdcg(A,b,x0,W,eps,AW,mi)
+function [x,mu] = nonpcdcg(l,A,b,x0,W,eps,AW,mi,mu)
     % Init
     WTAW = transpose(W)*AW;
     i = 0;
-    r = b - A*x0;
-
+    r0 = b - A*x0;
+    
+    %storage
+    ds = zeros(l,1);
+    as = zeros(l,1);
+    bs = zeros(l,1);
+    m = zeros(l,1);
+    p = zeros(l,1);
+    
+    
     % Choose x such that W^T*r = 0 where r = b - Ax
-    Wr = transpose(W)*r;
+    Wr = transpose(W)*r0;
     Wr = WTAW \ Wr;
     x = x0 + W*Wr; 
 
     % Calculate updated residual and deltas
     r = b - A*x;
-    % Solve W^T*A*W*mu = W^T*A*r for mu
-    mu = WTAW \ (transpose(W)*A*r);
-    dtnew = transpose(r)*r;
+
+    % Solve W^T*A*W*mu = W^T*A*r for mu if initial iteration
+    if nargin < 8
+        m(0) = WTAW \ (transpose(W)*A*r);
+    else
+        m(0) = mu;
+    end
+    p(0) = r - W*mu;
+    
+    dtnew = transpose(p(0))*A*p(0);
     dt0 = dtnew;
-    p = r - W*mu;    
+     
     
     while (i < mi) && (dtnew > eps^2*dt0)
-        q = A*p;
-        % periodically calculate residual explicitely to avoid numerical
-        % error from recurrence;
+        d(j-1) = p(j-1)*A*p(0);
         alpha = dtnew / (transpose(p)*q);
         x = x + alpha*p;
 
@@ -101,16 +116,24 @@ function [x] = nonpcdcg(A,b,x0,W,eps,AW,mi)
         bta = dtnew / dtold;
 
         % Possibly eliminate this somehow?
-        mu = WTAW \ (transpose(W)*A*r)
+        mu = WTAW \ (transpose(W)*A*r);
         p = bta*p + r - W*mu;
         
         i = i+1;
+        if j < l
+           ds(j-1) = dtnew;
+           as(j-1) = alpha;
+           bs(j-1) = bta;
+           m(j) = mu;
+           p(j) = p;
+        end    
+        j = j+1
     end
 end
 
 
 % Preconditioned Deflated-CG
-function [x] = pcdcg(A,b,x0,W,eps,AW,M,mi)
+function [x,mu] = pcdcg(A,b,x0,W,eps,AW,M,mi,mu)
     % Init
     WTAW = transpose(W)*AW;
     i = 0;
@@ -124,8 +147,10 @@ function [x] = pcdcg(A,b,x0,W,eps,AW,M,mi)
     % Calculate update residual and z
     r = b-A*x;
     z = M \ r;
-    % Solve W^T*A*W*mu = W^T*A*z for mu
-    mu = WTAW \ (transpose(W)*A*z);
+    % Solve W^T*A*W*mu = W^T*A*z for mu if intial iteration
+    if nargin < 9
+        mu = WTAW \ (transpose(W)*A*z);
+    end
     dtnew = transpose(r)*z;
     dt0 = dtnew;
     p = z - W*mu;
